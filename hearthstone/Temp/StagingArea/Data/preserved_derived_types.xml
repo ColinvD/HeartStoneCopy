@@ -1,0 +1,16 @@
+<linker>
+<assembly fullname="Assembly-CSharp">
+<type fullname="Attack" preserve="all"/>
+<type fullname="BattlefieldCardList" preserve="all"/>
+<type fullname="CardData" preserve="all"/>
+<type fullname="CardMove" preserve="all"/>
+<type fullname="CardsInHand" preserve="all"/>
+<type fullname="CardToMousePosition" preserve="all"/>
+<type fullname="CreateRayCast" preserve="all"/>
+<type fullname="DamageMessage" preserve="all"/>
+<type fullname="GameManagement" preserve="all"/>
+<type fullname="Health" preserve="all"/>
+<type fullname="ManaAmount" preserve="all"/>
+<type fullname="TurnSwitch" preserve="all"/>
+</assembly>
+</linker>

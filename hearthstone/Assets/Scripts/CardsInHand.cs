@@ -32,10 +32,18 @@ public class CardsInHand : MonoBehaviour
             }
             for(int i = 0; i < Cards.Count; i++)
             {
-                float yRot = (-(Cards.Count - 1.0f) / 2.0f + i) * 20;
-                float xPos = (-(Cards.Count - 1.0f) / 2.0f + i) * 2;
+                float yRot;
+                if (Cards.Count > 3)
+                {
+                    yRot = (-(Cards.Count - 1.0f) / 2.0f + i) * 20;
+                }
+                else
+                {
+                    yRot = 0.0f;
+                }
+                float xPos = (-(Cards.Count - 1.0f) / 2.0f + i) * 2.1f;
                 float zPos = 0;
-                cardRotations.Add(new Vector3(0, yRot, -20));
+                cardRotations.Add(new Vector3(0, yRot, 0));
                 cardPositions.Add(new Vector3(rotationPoint.position.x + xPos, 3, rotationPoint.position.z + zPos));
                 Cards[i].transform.eulerAngles = cardRotations[i];
                 Cards[i].transform.position = cardPositions[i];
@@ -68,5 +76,35 @@ public class CardsInHand : MonoBehaviour
             }
         }
         return cardPositions[card];
+    }
+    public Vector3 getCardPositions(GameObject card)
+    {
+        int tmp = 0;
+        for (int i = 0; i < Cards.Count; i++)
+        {
+            if (card == Cards[i])
+            {
+                tmp = i;
+            }
+        }
+        return cardPositions[tmp];
+    }
+
+    public bool removeCard(GameObject card)
+    {
+        if(Cards.Contains(card))
+        {
+            Cards.Remove(card);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool ContainsCard(GameObject card)
+    {
+        return Cards.Contains(card);
     }
 }

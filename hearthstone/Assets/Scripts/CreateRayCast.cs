@@ -8,14 +8,18 @@ public class CreateRayCast : MonoBehaviour
     private CardsInHand cardsHand;
     private ManaAmount manaAmount;
     private CardData cardData;
+    private BattlefieldCardList battlefieldList;
+    private Attack attack;
     private int cardMask;
     private int playfieldMask;
     private int defaultMask;
+    private float maxRayDistance = 200f;
 
     void Start()
     {
         manaAmount = FindObjectOfType<ManaAmount>();
         cardsHand = FindObjectOfType<CardsInHand>();
+        battlefieldList = FindObjectOfType<BattlefieldCardList>();
         cardMask = LayerMask.GetMask("Cards");
         playfieldMask = LayerMask.GetMask("Playfield");
         defaultMask = ~cardMask;
@@ -28,7 +32,7 @@ public class CreateRayCast : MonoBehaviour
         
         Debug.DrawRay(ray.origin, ray.direction * 100, Color.red);
 
-        if(Physics.Raycast(ray, out hit, 50f, defaultMask)) //everything else but not the cards
+        if(Physics.Raycast(ray, out hit, maxRayDistance, defaultMask)) //everything else but not the cards
         {
             if(Input.GetMouseButtonDown(0) && hit.collider.tag == "EndTurnButton")
             {
@@ -36,7 +40,7 @@ public class CreateRayCast : MonoBehaviour
             }
             if(Input.GetMouseButtonUp(0) && hit.collider.name != "FightField")
             {
-                if(moveActions != null)
+                if(moveActions != null && cardsHand.ContainsCard(moveActions.gameObject))
                 {
                     moveActions.gameObject.transform.position = cardsHand.getCardPositions(moveActions.gameObject.name);
                     moveActions.gameObject.transform.eulerAngles = cardsHand.getCardRotations(moveActions.gameObject.name);
@@ -44,34 +48,49 @@ public class CreateRayCast : MonoBehaviour
             }
         }
 
-        if(Physics.Raycast(ray, out hit, 50f, cardMask)) //selecting the card
+        if(Physics.Raycast(ray, out hit, maxRayDistance, cardMask)) //selecting the card
         {
             if(Input.GetMouseButtonDown(0) && hit.collider.tag == "Card")
             {
                 moveActions = hit.collider.GetComponent<CardToMousePosition>();
                 cardData = hit.collider.GetComponent<CardData>();
+                if (hit.collider.GetComponent<Attack>() != null) {
+                    attack = hit.collider.GetComponent<Attack>();
+                } else
+                {
+                    attack = null;
+                }
             }
         }
 
-        if(Physics.Raycast(ray, out hit, 50f, playfieldMask)) //move the card
+        if(Physics.Raycast(ray, out hit, maxRayDistance, playfieldMask)) //move the card
         {
             if(moveActions != null && cardData != null)
             {
-                if (cardData.GetManaCost() <= manaAmount.GetCurrentMana())
+                if(cardData.GetManaCost() <= manaAmount.GetCurrentMana())
                 {
-                    if (Input.GetMouseButtonDown(0))
+                    if(Input.GetMouseButtonDown(0))
                     {
                         moveActions.FollowChange();
                     }
-                    if (Input.GetMouseButton(0))
-                    {
-                        moveActions.ChangePosition(hit);
-                    }
-                    if (Input.GetMouseButtonUp(0))
+                    else if(Input.GetMouseButtonUp(0))
                     {
                         moveActions.FollowChange();
+                        if(cardsHand.removeCard(moveActions.gameObject))
+                        {
+                            battlefieldList.AddToArray(moveActions.gameObject);
+                        }
+                        else
+                        {
+                            attack.CheckHit();
+                            battlefieldList.CardOrderner();
+                        }
                         moveActions = null;
                         cardData = null;
+                    }
+                    else if(Input.GetMouseButton(0))
+                    {
+                        moveActions.ChangePosition(hit);
                     }
                 }
             }

@@ -7,6 +7,7 @@ TagManager:
   - Card
   - EndTurnButton
   - FightField
+  - Enemy
   layers:
   - Default
   - TransparentFX
